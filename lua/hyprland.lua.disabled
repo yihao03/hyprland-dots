@@ -1,4 +1,5 @@
--- This is an example Hyprland Lua config file.
+-- Disabled after converting the configuration back to Hyprlang in hyprland.conf.
+-- This was the Lua entrypoint; the split Lua files remain as a backup/reference.
 -- Refer to the wiki for more information.
 -- https://wiki.hypr.land/Configuring/Start/
 
@@ -17,4 +18,3 @@ require("misc")
 require("input")
 require("keybinds")
 require("windowrules")
-

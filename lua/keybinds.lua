@@ -56,7 +56,7 @@ hl.config({
 			bg_col = "rgb(111111)",
 			workspace_method = "center current",
 			skip_empty = true,
-			gesture_distance = 300,
+			gesture_distance = 3,
 		},
 	},
 })
