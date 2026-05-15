@@ -50,7 +50,17 @@ hl.window_rule({
 
 -- firefox open in same workspace
 hl.window_rule({
-	match = { class = "firefox" },
+	match = { class = "firefox|ghostty" },
 	workspace = "current",
 })
 
+hl.window_rule({
+	match = { initial_class = "com.mitchellh.ghostty" },
+	workspace = "current",
+})
+
+-- waydroid
+hl.window_rule({
+	match = { class = "Waydroid" },
+	workspace = 10,
+})

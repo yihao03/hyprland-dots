@@ -12,13 +12,9 @@ hl.config({
 
 		follow_mouse = 1,
 
-		sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
-
 		touchpad = {
 			natural_scroll = true,
 		},
-
-		follow_mouse = 2,
 	},
 })
 
@@ -26,6 +22,17 @@ hl.gesture({
 	fingers = 3,
 	direction = "horizontal",
 	action = "workspace",
+})
+
+-- hl.gesture({
+-- 	fingers = 3,
+-- 	direction = "horizontal",
+-- 	action = "scroll_move",
+-- })
+
+hl.device({
+	name = " mx-anywhere-2s-mouse",
+	sensitivity = -0.5, -- -1.0 - 1.0, 0 means no modification.
 })
 
 -- Example per-device config

@@ -7,7 +7,7 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
-hl.bind(mainMod .. " + C", hl.dsp.window.close())
+hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.noctPrefix .. " controlCenter toggle"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher clipboard"))
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
@@ -47,40 +47,6 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
-
-hl.config({
-	plugin = {
-		hyprexpo = {
-			columns = 3,
-			gap_size = 0,
-			bg_col = "rgb(111111)",
-			workspace_method = "center current",
-			skip_empty = true,
-			gesture_distance = 3,
-		},
-	},
-})
-
--- Bind
-hl.bind("SUPER + grave", function()
-	hl.plugin.hyprexpo.expo("toggle")
-end)
-
-hl.gesture({
-	fingers = 3,
-	direction = "up",
-	action = function()
-		hl.plugin.hyprexpo.expo("on")
-	end,
-})
-
-hl.gesture({
-	fingers = 3,
-	direction = "down",
-	action = function()
-		hl.plugin.hyprexpo.expo("off")
-	end,
-})
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
