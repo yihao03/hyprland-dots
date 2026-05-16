@@ -33,9 +33,9 @@ hl.window_rule({
 
 -- Layer rules also return a handle.
 -- local overlayLayerRule = hl.layer_rule({
---     name  = "no-anim-overlay",
---     match = { namespace = "^my-overlay$" },
---     no_anim = true,
+-- 	name = "no-anim-overlay",
+-- 	match = { namespace = "^my-overlay$" },
+-- 	no_anim = true,
 -- })
 -- overlayLayerRule:set_enabled(false)
 
@@ -50,7 +50,7 @@ hl.window_rule({
 
 -- firefox open in same workspace
 hl.window_rule({
-	match = { class = "firefox|ghostty" },
+	match = { class = "firefox" },
 	workspace = "current",
 })
 
@@ -59,8 +59,22 @@ hl.window_rule({
 	workspace = "current",
 })
 
+hl.window_rule({
+	match = {
+		class = "org.telegram.desktop",
+		title = "Media viewer",
+	},
+	workspace = "current",
+	fullscreen = true,
+})
+
 -- waydroid
 hl.window_rule({
 	match = { class = "Waydroid" },
 	workspace = 10,
 })
+
+--------------------------------
+-- Bind workspace to monitor  --
+--------------------------------
+hl.workspace_rule({ workspace = "1", monitor = "DP-3" })
