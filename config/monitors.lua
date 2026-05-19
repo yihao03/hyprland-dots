@@ -23,8 +23,7 @@ hl.monitor({
 	output = "desc:Beihai Century Joint Innovation Technology Co.Ltd X240 0000000000000",
 	mode = "1920x1080@120",
 	position = "auto-center-left",
-	bitdepth = 8,
-	vrr = 0,
+	cm = "auto",
 })
 
 -- com3 b1 tv

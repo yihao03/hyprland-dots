@@ -55,6 +55,18 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	match = { class = "org.mozilla.Thunderbird", title = "Confirm Deletion" },
+	workspace = "current",
+	float = true,
+})
+
+hl.window_rule({
+	match = { title = "Picture-in-Picture" },
+	float = true,
+	size = { "(monitor_w*0.3)", "(monitor_h*0.3)" },
+})
+
+hl.window_rule({
 	match = { initial_class = "com.mitchellh.ghostty" },
 	workspace = "current",
 })
@@ -66,6 +78,12 @@ hl.window_rule({
 	},
 	workspace = "current",
 	fullscreen = true,
+})
+
+hl.window_rule({
+	match = { class = "org.telegram.desktop", title = "Choose Files" },
+	float = true,
+	workspace = "current",
 })
 
 -- waydroid

@@ -2,21 +2,29 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-local programs = require("autostart")
+local programs = require("config.autostart")
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.noctPrefix .. " controlCenter toggle"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher clipboard"))
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.move({ workspace = "+0", monitor = "+1" }))
 
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(programs.noctPrefix .. " sessionMenu toggle"))
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + V", function()
+	hl.dispatch(hl.dsp.window.float({ toggle = true }))
+	local monitor = hl.get_active_monitor()
+	if monitor then
+		hl.dispatch(hl.dsp.window.resize({ x = monitor.width / 2, y = monitor.height / 2 }))
+	end
+end)
 hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(programs.menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
@@ -90,4 +98,4 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tru
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
 -- Printscreen
-hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
+hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
