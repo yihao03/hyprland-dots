@@ -52,6 +52,10 @@ hl.config({
 		enabled = true,
 	},
 
+	xwayland = {
+		force_zero_scaling = true,
+	},
+
 	binds = {
 		hide_special_on_workspace_change = true,
 	},

@@ -12,7 +12,7 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.noctPrefix .. " controlCenter toggle"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher clipboard"))
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.move({ workspace = "+0", monitor = "+1" }))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
 
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(programs.noctPrefix .. " sessionMenu toggle"))
@@ -26,7 +26,7 @@ hl.bind(mainMod .. " + V", function()
 	end
 end)
 hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(programs.menu))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+-- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 
@@ -43,10 +43,10 @@ hl.bind(mainMod .. " + up", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + down", hl.dsp.window.move({ direction = "down" }))
 
 -- Resize windows
-hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -98,4 +98,7 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tru
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
 -- Printscreen
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'), { locked = true })
 hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
+
+return { mainMod = mainMod }
