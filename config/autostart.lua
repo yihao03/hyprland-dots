@@ -4,10 +4,10 @@
 
 -- Set programs that you use
 local terminal = "ghostty +new-window"
-local fileManager = "dolphin"
+local fileManager = "thunar"
 local noctPrefix = "qs -c noctalia-shell ipc call"
 local menu = noctPrefix .. " launcher toggle"
-local browser = "firefox"
+local browser = "helium-browser"
 
 -------------------
 ---- AUTOSTART ----
