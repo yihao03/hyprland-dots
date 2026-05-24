@@ -57,6 +57,10 @@ hl.window_rule({
 hl.window_rule({
 	match = { class = "org.mozilla.Thunderbird", title = "Confirm Deletion" },
 	workspace = "current",
+})
+
+hl.window_rule({
+	match = { class = "org.mozilla.Thunderbird", initial_title = "negative:Mozilla Thunderbird" },
 	float = true,
 })
 
@@ -92,6 +96,11 @@ hl.window_rule({
 	workspace = 10,
 })
 
+-- zoom
+hl.window_rule({
+	match = { class = "Zoom", initial_title = "negative:Zoom Workplace|Meeting" },
+	float = true,
+})
 --------------------------------
 -- Bind workspace to monitor  --
 --------------------------------
