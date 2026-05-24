@@ -11,8 +11,8 @@ hl.env("GTK_USE_PORTAL", "1")
 hl.env("EDITOR", "nvim")
 
 -- input method framework
-hl.env("GTK_IM_MODULE", "fcitx")
-hl.env("QT_IM_MODULE", "fcitx")
+-- hl.env("GTK_IM_MODULE", "fcitx")
+-- hl.env("QT_IM_MODULE", "fcitx")
 
 -- dark theme
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
