@@ -11,11 +11,12 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.noctPrefix .. " controlCenter toggle"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher clipboard"))
-hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
+-- hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
 
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(programs.noctPrefix .. " sessionMenu toggle"))
+
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + V", function()
@@ -26,9 +27,9 @@ hl.bind(mainMod .. " + V", function()
 	end
 end)
 hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(programs.menu))
--- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("wl-mirror eDP-1"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
