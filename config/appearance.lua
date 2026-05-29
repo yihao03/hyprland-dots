@@ -56,6 +56,12 @@ hl.config({
 		force_zero_scaling = true,
 	},
 
+	render = {
+		-- disable for better hdr experience
+		-- behaves funny with helium browser
+		cm_auto_hdr = false,
+	},
+
 	binds = {
 		hide_special_on_workspace_change = true,
 	},
