@@ -28,6 +28,8 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("Telegram", { workspace = "special:magic" })
 	hl.exec_cmd("thunderbird", { workspace = "special:magic" })
+
+	hl.exec_cmd("hyprpm reload")
 end)
 
 return { terminal = terminal, fileManager = fileManager, noctPrefix = noctPrefix, menu = menu, browser = browser }
