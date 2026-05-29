@@ -25,6 +25,12 @@ hl.bind(mainMod .. " + P", function()
 	if lid_closed then
 		return
 	end
+
+	local monitors = hl.get_monitors()
+	if #monitors == 1 then
+		hl.notification.create({ text = "No external monitor detected", duration = 3000 })
+		return
+	end
 	built_in_disabled = not built_in_disabled
 	if built_in_disabled then
 		toggle_built_in = true
