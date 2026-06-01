@@ -81,4 +81,15 @@ hl.window_rule({
 hl.window_rule({
 	match = { class = "Zoom", initial_title = "negative:Zoom Workplace|Meeting" },
 	float = true,
+	pin = true,
+})
+
+hl.window_rule({
+	match = { class = "Zoom", title = "Meeting" },
+	fullscreen_state = "1 3",
+})
+
+hl.window_rule({
+	match = { class = "DesktopEditors" },
+	center = true,
 })
