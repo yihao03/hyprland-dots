@@ -1,18 +1,3 @@
----------------------
----- MY PROGRAMS ----
----------------------
-
--- Set programs that you use
-local terminal = "ghostty +new-window"
-local fileManager = "thunar"
-local noctPrefix = "qs -c noctalia-shell ipc call"
-local menu = noctPrefix .. " launcher toggle"
-local browser = "helium-browser"
-
--------------------
----- AUTOSTART ----
--------------------
-
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 
 -- Autostart necessary processes (like notifications daemons, status bars, etc.)
@@ -31,5 +16,3 @@ hl.on("hyprland.start", function()
 
 	hl.exec_cmd("hyprpm reload")
 end)
-
-return { terminal = terminal, fileManager = fileManager, noctPrefix = noctPrefix, menu = menu, browser = browser }

@@ -60,7 +60,13 @@ hl.bind("switch:off:Lid Switch", function()
 	hl.exec_cmd("hyprctl reload")
 end, { locked = true })
 
-hl.bind(mainMod .. " + P", hl.dsp.submap("displayControl"))
+hl.bind(mainMod .. " + P", function()
+	hl.notification.create({
+		text = "D: disable built-in display, M: Mirror screen, H: Hide mirroring",
+		duration = 5000,
+	})
+	hl.dispatch(hl.dsp.submap("displayControl"))
+end)
 
 hl.define_submap("displayControl", "reset", function()
 	hl.bind("D", function()
@@ -80,7 +86,7 @@ hl.define_submap("displayControl", "reset", function()
 		hl.monitor({ output = "eDP-1", disabled = built_in_disabled })
 	end)
 
-	hl.bind("S", function()
+	hl.bind("M", function()
 		local monitors = hl.get_monitors()
 		if #monitors == 1 then
 			hl.notification.create({ text = "No external monitor detected", duration = 3000 })

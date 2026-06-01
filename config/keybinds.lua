@@ -2,23 +2,23 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-local programs = require("config.autostart")
-local mainMod = "SUPER" -- Sets "Windows" key as main modifier
+local constants = require("config.constants")
+local mainMod = constants.mainMod
 
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(programs.terminal))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
+hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(constants.terminal))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(constants.browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.noctPrefix .. " controlCenter toggle"))
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher clipboard"))
--- hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(programs.noctPrefix .. " launcher windows"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(constants.noctPrefix .. " controlCenter toggle"))
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(constants.noctPrefix .. " launcher clipboard"))
+-- hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(constants.noctPrefix .. " launcher windows"))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
 
 -- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(programs.noctPrefix .. " sessionMenu toggle"))
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noctPrefix .. " sessionMenu toggle"))
 
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(constants.fileManager))
 hl.bind(mainMod .. " + V", function()
 	hl.dispatch(hl.dsp.window.float({ toggle = true }))
 	local monitor = hl.get_active_monitor()
@@ -26,7 +26,7 @@ hl.bind(mainMod .. " + V", function()
 		hl.dispatch(hl.dsp.window.resize({ x = monitor.width / 2, y = monitor.height / 2 }))
 	end
 end)
-hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(programs.menu))
+hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 
