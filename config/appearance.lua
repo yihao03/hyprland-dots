@@ -63,6 +63,7 @@ hl.config({
 	},
 
 	binds = {
+		drag_threshold = 30,
 		hide_special_on_workspace_change = true,
 	},
 })

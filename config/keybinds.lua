@@ -29,7 +29,6 @@ end)
 hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(programs.menu))
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("wl-mirror eDP-1"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
@@ -56,6 +55,12 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
+
+hl.gesture({
+	fingers = 3,
+	direction = "horizontal",
+	action = "workspace",
+})
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
