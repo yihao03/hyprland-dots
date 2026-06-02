@@ -60,54 +60,72 @@ hl.bind("switch:off:Lid Switch", function()
 	hl.exec_cmd("hyprctl reload")
 end, { locked = true })
 
+local function toggle_built_in_display()
+	local monitors = hl.get_monitors()
+	if #monitors == 1 and monitors[1].name == "eDP-1" then
+		hl.notification.create({ text = "No external monitor detected", duration = 3000 })
+		return
+	end
+
+	if lid_closed then
+		return
+	end
+	built_in_disabled = not built_in_disabled
+	if built_in_disabled then
+		toggle_built_in = true
+	end
+	hl.monitor({ output = "eDP-1", disabled = built_in_disabled })
+end
+
+local function mirror_screen()
+	local monitors = hl.get_monitors()
+	if #monitors == 1 then
+		hl.notification.create({ text = "No external monitor detected", duration = 3000 })
+		return
+	end
+
+	for _, monitor in ipairs(monitors) do
+		if monitor.name ~= "eDP-1" then
+			hl.exec_cmd("wl-mirror eDP-1", { monitor = monitor.name, fullscreen = true })
+			return
+		end
+	end
+end
+
+local function hide_mirroring()
+	local window = hl.get_window("class:at.yrlf.wl_mirror")
+	if window then
+		hl.dispatch(hl.dsp.dpms({ monitor = window.monitor.name, action = "toggle" }))
+	else
+		hl.notification.create({ text = "No mirrored monitor found", duration = 3000 })
+	end
+end
+
+local displayBinds = {
+	{ key = "T", desc = "Toggle built-in display", fn = toggle_built_in_display },
+	{ key = "M", desc = "Mirror screen", fn = mirror_screen },
+	{ key = "H", desc = "Hide mirroring", fn = hide_mirroring },
+}
+
 hl.bind(mainMod .. " + P", function()
+	local parts = {}
+	for i, b in ipairs(displayBinds) do
+		parts[i] = b.key .. ": " .. b.desc
+	end
 	hl.notification.create({
-		text = "D: disable built-in display, M: Mirror screen, H: Hide mirroring",
+		text = table.concat(parts, ", "),
 		duration = 5000,
 	})
 	hl.dispatch(hl.dsp.submap("displayControl"))
 end)
 
 hl.define_submap("displayControl", "reset", function()
-	hl.bind("D", function()
-		local monitors = hl.get_monitors()
-		if #monitors == 1 and monitors[1].name == "eDP-1" then
-			hl.notification.create({ text = "No external monitor detected", duration = 3000 })
-			return
-		end
+	for _, b in ipairs(displayBinds) do
+		hl.bind(b.key, b.fn)
+	end
 
-		if lid_closed then
-			return
-		end
-		built_in_disabled = not built_in_disabled
-		if built_in_disabled then
-			toggle_built_in = true
-		end
-		hl.monitor({ output = "eDP-1", disabled = built_in_disabled })
-	end)
-
-	hl.bind("M", function()
-		local monitors = hl.get_monitors()
-		if #monitors == 1 then
-			hl.notification.create({ text = "No external monitor detected", duration = 3000 })
-			return
-		end
-
-		for _, monitor in ipairs(monitors) do
-			if monitor.name ~= "eDP-1" then
-				hl.exec_cmd("wl-mirror eDP-1", { monitor = monitor.name, fullscreen = true })
-				return
-			end
-		end
-	end)
-
-	hl.bind("H", function()
-		local window = hl.get_window("class:at.yrlf.wl_mirror")
-		if window then
-			hl.dispatch(hl.dsp.dpms({ monitor = window.monitor.name, action = "toggle" }))
-		else
-			hl.notification.create({ text = "No mirrored monitor found", duration = 3000 })
-		end
+	hl.bind("catchall", function()
+		hl.notification.create({ text = "Escaping display control", duration = 3000 })
 	end)
 end)
 
