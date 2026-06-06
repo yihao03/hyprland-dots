@@ -1,4 +1,4 @@
-local mainMod = require("config.keybinds").mainMod
+local mainMod = require("config.constants").mainMod
 
 local function setup_hymission()
 	if hl.plugin.hymission == nil then
@@ -31,7 +31,7 @@ local function setup_hyprexpo()
 				gaps_in = 0,
 				gaps_out = 0,
 				bg_col = "rgb(111111)",
-				workspace_method = "center current",
+				workspace_method = "first 1",
 				gesture_distance = 200,
 				cancel_key = "escape",
 				show_cursor = 1,
@@ -162,13 +162,12 @@ local function setup_dynamic_cursors()
 				-- configure shake to find
 				-- magnifies the cursor if its is being shaken
 				shake = {
-
 					-- enables shake to find
 					enabled = true,
 
 					-- controls how soon a shake is detected
 					-- lower values mean sooner
-					threshold = 6.0,
+					threshold = 4.0,
 
 					-- magnification level immediately after shake start
 					base = 2.0,
@@ -182,7 +181,7 @@ local function setup_dynamic_cursors()
 					limit = 0.0,
 
 					-- time in milliseconds the cursor will stay magnified after a shake has ended
-					timeout = 500,
+					timeout = 300,
 
 					-- show cursor behaviour `tilt`, `rotate`, etc. while shaking
 					effects = false,

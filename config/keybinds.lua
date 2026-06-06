@@ -5,20 +5,21 @@
 local constants = require("config.constants")
 local mainMod = constants.mainMod
 
--- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
+-- open apps
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(constants.terminal))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(constants.browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(constants.fileManager))
+
+-- noctalia commands
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noctPrefix .. " sessionMenu toggle"))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(constants.noctPrefix .. " controlCenter toggle"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(constants.noctPrefix .. " launcher clipboard"))
--- hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd(constants.noctPrefix .. " launcher windows"))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
-
--- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noctPrefix .. " sessionMenu toggle"))
+hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(constants.fileManager))
+
+-- Windowing controls
 hl.bind(mainMod .. " + V", function()
 	hl.dispatch(hl.dsp.window.float({ toggle = true }))
 	local monitor = hl.get_active_monitor()
@@ -26,9 +27,10 @@ hl.bind(mainMod .. " + V", function()
 		hl.dispatch(hl.dsp.window.resize({ x = monitor.width / 2, y = monitor.height / 2 }))
 	end
 end)
-hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+hl.bind("ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
@@ -37,10 +39,10 @@ hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
 -- Move the windows
-hl.bind(mainMod .. " + left", hl.dsp.window.move({ direction = "left" }))
-hl.bind(mainMod .. " + right", hl.dsp.window.move({ direction = "right" }))
-hl.bind(mainMod .. " + up", hl.dsp.window.move({ direction = "up" }))
-hl.bind(mainMod .. " + down", hl.dsp.window.move({ direction = "down" }))
+hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
 
 -- Resize windows
 hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
@@ -53,25 +55,39 @@ hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = -50, rel
 for i = 1, 10 do
 	local key = i % 10 -- 10 maps to key 0
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
-	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
+-- Switch to next/previous workspace
+hl.bind(mainMod .. " + N", hl.dsp.focus({ workspace = "e+1", on_current_monitor = true }))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.focus({ workspace = "emptym", on_current_monitor = true }))
 hl.gesture({
 	fingers = 3,
 	direction = "horizontal",
 	action = "workspace",
 })
 
--- Example special workspace (scratchpad)
+-- Swap monitors
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
+
+-- special workspace (communication)
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
--- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
+-- Move windows to workspace
+hl.bind(mainMod .. " + M", function()
+	hl.notification.create({ text = "Select workspace to move window to", duration = 3000 })
+	hl.dispatch(hl.dsp.submap("moveToWorkspace"))
+end)
 
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind("ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
+hl.define_submap("moveToWorkspace", "reset", function()
+	for i = 1, 10 do
+		hl.bind(tostring(i % 10), hl.dsp.window.move({ workspace = i }))
+	end
+
+	hl.bind("catchall", function()
+		hl.notification.create({ text = "Invalid workspace", duration = 2000 })
+	end)
+end)
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind(
@@ -104,7 +120,5 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tru
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
 -- Printscreen
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'), { locked = true })
 hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
-
-return { mainMod = mainMod }
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'), { locked = true })

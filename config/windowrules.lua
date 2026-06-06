@@ -90,6 +90,20 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	match = { class = "Zoom", title = "zoom_linux_float_video_window" },
+	float = true,
+	pin = true,
+	move = { "monitor_w * 0.8", "monitor_h * 0.2" },
+})
+
+hl.window_rule({
+	match = { class = "Zoom", title = "as_toolbar" },
+	pin = true,
+	move = { "monitor_w * 0.5 - (window_w * 0.5)", "20" },
+})
+
+-- onlyoffice
+hl.window_rule({
 	match = { class = "DesktopEditors" },
 	center = true,
 })

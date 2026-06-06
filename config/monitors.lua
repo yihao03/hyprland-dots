@@ -26,18 +26,10 @@ hl.monitor({
 	bitdepth = 10,
 })
 
-hl.monitor({
-	output = "",
-	mode = "preferred",
-	position = "auto",
-	scale = 1,
-	mirror = "eDP-1",
-})
-
 ----------------------------
 ---- DISPLAY SHORTCUTS  ----
 ----------------------------
-local mainMod = require("config.keybinds").mainMod
+local mainMod = require("config.constants").mainMod
 local lid_closed = false
 local toggle_built_in = false
 local built_in_disabled = false
@@ -70,6 +62,7 @@ local function toggle_built_in_display()
 	if lid_closed then
 		return
 	end
+
 	built_in_disabled = not built_in_disabled
 	if built_in_disabled then
 		toggle_built_in = true
@@ -84,27 +77,32 @@ local function mirror_screen()
 		return
 	end
 
-	for _, monitor in ipairs(monitors) do
-		if monitor.name ~= "eDP-1" then
-			hl.exec_cmd("wl-mirror eDP-1", { monitor = monitor.name, fullscreen = true })
-			return
-		end
-	end
-end
-
-local function hide_mirroring()
 	local window = hl.get_window("class:at.yrlf.wl_mirror")
 	if window then
-		hl.dispatch(hl.dsp.dpms({ monitor = window.monitor.name, action = "toggle" }))
+		hl.notification.create({ text = "Stopping screen mirroring", duration = 3000 })
+		hl.exec_cmd("pkill -9 wl-mirror")
 	else
-		hl.notification.create({ text = "No mirrored monitor found", duration = 3000 })
+		for _, monitor in ipairs(monitors) do
+			if monitor.name ~= "eDP-1" then
+				hl.notification.create({
+					text = "Starting screen mirroring on " .. monitor.description,
+					duration = 3000,
+				})
+				hl.exec_cmd("wl-mirror eDP-1", { monitor = monitor.name, fullscreen = true })
+			end
+		end
+
+		-- Focus the built in display after a short delay to prevent the spawned wl-mirror
+		-- window from stealing focus
+		hl.timer(function()
+			hl.dispatch(hl.dsp.focus({ monitor = "eDP-1" }))
+		end, { timeout = 50, type = "oneshot" })
 	end
 end
 
 local displayBinds = {
 	{ key = "T", desc = "Toggle built-in display", fn = toggle_built_in_display },
-	{ key = "M", desc = "Mirror screen", fn = mirror_screen },
-	{ key = "H", desc = "Hide mirroring", fn = hide_mirroring },
+	{ key = "M", desc = "Toggle mirroring", fn = mirror_screen },
 }
 
 hl.bind(mainMod .. " + P", function()
@@ -114,7 +112,7 @@ hl.bind(mainMod .. " + P", function()
 	end
 	hl.notification.create({
 		text = table.concat(parts, ", "),
-		duration = 5000,
+		duration = 3000,
 	})
 	hl.dispatch(hl.dsp.submap("displayControl"))
 end)
