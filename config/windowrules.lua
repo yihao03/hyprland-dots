@@ -74,7 +74,8 @@ hl.window_rule({
 -- waydroid
 hl.window_rule({
 	match = { class = "Waydroid" },
-	workspace = 10,
+	fullscreen = true,
+	workspace = "emptynm",
 })
 
 -- zoom

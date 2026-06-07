@@ -9,6 +9,7 @@ local mainMod = constants.mainMod
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(constants.terminal))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(constants.browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.window.signal({ signal = 9 }))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(constants.fileManager))
 
 -- noctalia commands
@@ -28,7 +29,14 @@ hl.bind(mainMod .. " + V", function()
 	end
 end)
 hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
+hl.bind(mainMod .. " + F", function()
+	local opts = { action = "toggle", internal = 2, client = 2 }
+	-- prevent helium from going fullscreen and hiding sidebar
+	if hl.get_active_window().initial_class == "helium" then
+		opts.client = 0
+	end
+	hl.dispatch(hl.dsp.window.fullscreen_state(opts))
+end)
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
 
@@ -78,6 +86,8 @@ hl.bind(mainMod .. " + M", function()
 	hl.notification.create({ text = "Select workspace to move window to", duration = 3000 })
 	hl.dispatch(hl.dsp.submap("moveToWorkspace"))
 end)
+-- Move window to next empty workspace
+hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "emptym", follow = true }))
 
 hl.define_submap("moveToWorkspace", "reset", function()
 	for i = 1, 10 do
