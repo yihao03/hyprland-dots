@@ -30,6 +30,7 @@ hl.monitor({
 ---- DISPLAY SHORTCUTS  ----
 ----------------------------
 local mainMod = require("config.constants").mainMod
+local noctPrefix = require("config.constants").noctPrefix
 local lid_closed = false
 local toggle_built_in = false
 local built_in_disabled = false
@@ -38,9 +39,7 @@ hl.bind("switch:on:Lid Switch", function()
 	local monitors = hl.get_monitors()
 	lid_closed = true
 	if #monitors == 1 and not built_in_disabled then
-		hl.dispatch(
-			hl.dsp.exec_cmd("sh -c 'qs -c noctalia-shell ipc call lockScreen lock && sleep 1 && systemctl suspend'")
-		)
+		hl.dispatch(hl.dsp.exec_cmd(noctPrefix .. " session lock-and-suspend"))
 	else
 		hl.monitor({ output = "eDP-1", disabled = true })
 	end
@@ -138,6 +137,6 @@ hl.on("monitor.removed", function()
 		hl.monitor({ output = "eDP-1", disabled = built_in_disabled })
 		hl.exec_cmd("hyprctl reload")
 	else
-		hl.dsp.exec_cmd("sh -c 'qs -c noctalia-shell ipc call lockScreen lock && sleep 1 && systemctl suspend'")
+		hl.dsp.exec_cmd(noctPrefix .. " session lock-and-suspend")
 	end
 end)

@@ -1,7 +1,7 @@
 local terminal = "ghostty +new-window"
 local fileManager = "nautilus"
-local noctPrefix = "qs -c noctalia-shell ipc call"
-local menu = noctPrefix .. " launcher toggle"
+local noctPrefix = "noctalia msg"
+local menu = noctPrefix .. " panel-toggle launcher"
 local browser = "brave-origin-nightly"
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 

@@ -14,9 +14,17 @@ hl.bind(mainMod .. " + SHIFT + W", hl.dsp.window.signal({ signal = 9 }))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(constants.fileManager))
 
 -- noctalia commands
-hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noctPrefix .. " sessionMenu toggle"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(constants.noctPrefix .. " controlCenter toggle"))
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(constants.noctPrefix .. " launcher clipboard"))
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noctPrefix .. " panel-toggle session"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(constants.noctPrefix .. " panel-toggle control-center"))
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(constants.noctPrefix .. " panel-toggle clipboard"))
+hl.bind("ALT + Tab", function()
+	for _, layer in ipairs(hl.get_layers()) do
+		if layer.namespace == "noctalia-window-switcher" then
+			return
+		end
+	end
+	hl.dispatch(hl.dsp.exec_cmd(constants.noctPrefix .. " window-switcher"))
+end, { non_consuming = true })
 hl.bind(mainMod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
@@ -135,8 +143,8 @@ hl.bind(
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
-hl.bind("XF86Calculator", hl.dsp.exec_cmd(noctPrefix .. " media playPause"), { locked = true })
+hl.bind("XF86Calculator", hl.dsp.exec_cmd(noctPrefix .. " media toggle"), { locked = true })
 
 -- Printscreen
-hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))
+hl.bind("Print", hl.dsp.exec_cmd(noctPrefix .. " screenshot-region"))
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'), { locked = true })
