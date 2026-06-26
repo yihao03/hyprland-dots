@@ -22,7 +22,7 @@ hl.monitor({
 	position = "auto",
 	scale = "1.5",
 	icc = "/home/yihao/.local/share/icc/default.icm",
-	-- cm = "wide",
+	-- cm = "auto",
 	bitdepth = 10,
 })
 
@@ -37,7 +37,7 @@ local built_in_disabled = false
 hl.bind("switch:on:Lid Switch", function()
 	local monitors = hl.get_monitors()
 	lid_closed = true
-	if #monitors == 1 then
+	if #monitors == 1 and not built_in_disabled then
 		hl.dispatch(
 			hl.dsp.exec_cmd("sh -c 'qs -c noctalia-shell ipc call lockScreen lock && sleep 1 && systemctl suspend'")
 		)
@@ -137,5 +137,7 @@ hl.on("monitor.removed", function()
 		built_in_disabled = false
 		hl.monitor({ output = "eDP-1", disabled = built_in_disabled })
 		hl.exec_cmd("hyprctl reload")
+	else
+		hl.dsp.exec_cmd("sh -c 'qs -c noctalia-shell ipc call lockScreen lock && sleep 1 && systemctl suspend'")
 	end
 end)

@@ -4,6 +4,7 @@
 
 local constants = require("config.constants")
 local mainMod = constants.mainMod
+local noctPrefix = constants.noctPrefix
 
 -- open apps
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(constants.terminal))
@@ -32,7 +33,8 @@ hl.bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- dwindle only
 hl.bind(mainMod .. " + F", function()
 	local opts = { action = "toggle", internal = 2, client = 2 }
 	-- prevent helium from going fullscreen and hiding sidebar
-	if hl.get_active_window().initial_class == "helium" then
+	local class = hl.get_active_window().initial_class
+	if class == "helium" or class == "brave-origin-nightly" then
 		opts.client = 0
 	end
 	hl.dispatch(hl.dsp.window.fullscreen_state(opts))
@@ -53,10 +55,10 @@ hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
 
 -- Resize windows
-hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + H", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + L", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + J", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + ALT + K", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true })
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -66,8 +68,10 @@ for i = 1, 10 do
 end
 
 -- Switch to next/previous workspace
-hl.bind(mainMod .. " + N", hl.dsp.focus({ workspace = "e+1", on_current_monitor = true }))
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.focus({ workspace = "emptym", on_current_monitor = true }))
+hl.bind(mainMod .. " + N", hl.dsp.focus({ workspace = "m+1" }))
+hl.bind(mainMod .. " + CTRL + N", hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.focus({ workspace = "prev" }))
+hl.bind(mainMod .. " + ALT + N", hl.dsp.focus({ workspace = "emptym", on_current_monitor = true }))
 hl.gesture({
 	fingers = 3,
 	direction = "horizontal",
@@ -76,6 +80,7 @@ hl.gesture({
 
 -- Swap monitors
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.workspace.swap_monitors({ monitor1 = "current", monitor2 = "+1" }))
+hl.bind(mainMod .. " + ALT + T", hl.dsp.workspace.move({ monitor = "+1" }))
 
 -- special workspace (communication)
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
@@ -83,19 +88,26 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 
 -- Move windows to workspace
 hl.bind(mainMod .. " + M", function()
+	if hl.get_active_window() == nil then
+		hl.notification.create({ text = "No active window", duration = 3000 })
+		return
+	end
 	hl.notification.create({ text = "Select workspace to move window to", duration = 3000 })
 	hl.dispatch(hl.dsp.submap("moveToWorkspace"))
 end)
--- Move window to next empty workspace
-hl.bind(mainMod .. " + SHIFT + M", hl.dsp.window.move({ workspace = "emptym", follow = true }))
 
-hl.define_submap("moveToWorkspace", "reset", function()
+hl.define_submap("moveToWorkspace", function()
 	for i = 1, 10 do
 		hl.bind(tostring(i % 10), hl.dsp.window.move({ workspace = i }))
 	end
 
-	hl.bind("catchall", function()
-		hl.notification.create({ text = "Invalid workspace", duration = 2000 })
+	hl.bind("N", hl.dsp.window.move({ workspace = "m+1" }))
+	hl.bind("P", hl.dsp.window.move({ workspace = "m-1" }))
+	hl.bind("E", hl.dsp.window.move({ workspace = "emptym", on_current_monitor = true }))
+
+	hl.bind("escape", function()
+		hl.notification.create({ text = "Escaped moving window", duration = 2000 })
+		hl.dispatch(hl.dsp.submap("reset"))
 	end)
 end)
 
@@ -123,11 +135,7 @@ hl.bind(
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
--- Requires playerctl
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+hl.bind("XF86Calculator", hl.dsp.exec_cmd(noctPrefix .. " media playPause"), { locked = true })
 
 -- Printscreen
 hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'))

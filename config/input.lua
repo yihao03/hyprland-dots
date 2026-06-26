@@ -30,5 +30,8 @@ hl.device({
 	sensitivity = -0.5, -- -1.0 - 1.0, 0 means no modification.
 })
 
--- Example per-device config
--- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
+hl.device({
+	name = "at-translated-set-2-keyboard",
+	kb_options = "caps:swapescape",
+	resolve_binds_by_sym = true,
+})

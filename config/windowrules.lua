@@ -39,6 +39,20 @@ hl.window_rule({
 -- })
 -- overlayLayerRule:set_enabled(false)
 
+hl.layer_rule({
+	name = "noctalia",
+	match = { namespace = "noctalia-.*-.*$" },
+	ignore_alpha = 0.5,
+	blur = true,
+	blur_popups = true,
+})
+
+hl.layer_rule({
+	name = "hide-notifications",
+	match = { namespace = "noctalia-notifications-.*$" },
+	no_screen_share = true,
+})
+
 hl.window_rule({
 	match = { class = "org.mozilla.Thunderbird", initial_title = "negative:Mozilla Thunderbird" },
 	float = true,
@@ -80,7 +94,12 @@ hl.window_rule({
 
 -- zoom
 hl.window_rule({
-	match = { class = "Zoom", initial_title = "negative:Zoom Workplace|Meeting" },
+	match = { class = "Zoom" },
+	no_blur = true,
+})
+
+hl.window_rule({
+	match = { class = "Zoom", initial_title = "negative:Zoom Workplace|Zoom Workplace - .*|Meeting" },
 	float = true,
 	pin = true,
 })
@@ -88,6 +107,7 @@ hl.window_rule({
 hl.window_rule({
 	match = { class = "Zoom", title = "Meeting" },
 	fullscreen_state = "1 3",
+	workspace = "emptynm",
 })
 
 hl.window_rule({
@@ -101,6 +121,11 @@ hl.window_rule({
 	match = { class = "Zoom", title = "as_toolbar" },
 	pin = true,
 	move = { "monitor_w * 0.5 - (window_w * 0.5)", "20" },
+})
+
+hl.window_rule({
+	match = { class = "Zoom", title = "annotate_toolbar" },
+	opacity = 0.3,
 })
 
 -- onlyoffice

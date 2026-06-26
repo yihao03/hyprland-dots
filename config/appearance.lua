@@ -11,7 +11,7 @@ hl.config({
 		border_size = 1,
 
 		col = {
-			active_border = { colors = { "rgba(eeae8abd)", "rgba(ae8abdee)" }, angle = 45 },
+			active_border = { colors = { "rgba(eeae8abd)", "rgba(ae8abdee)" }, angle = 90 },
 			inactive_border = "rgba(595959aa)",
 		},
 
@@ -57,9 +57,7 @@ hl.config({
 	},
 
 	render = {
-		-- disable for better hdr experience
-		-- behaves funny with helium browser
-		cm_auto_hdr = false,
+		cm_auto_hdr = true,
 	},
 
 	binds = {

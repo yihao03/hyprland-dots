@@ -1,24 +1,5 @@
 local mainMod = require("config.constants").mainMod
 
-local function setup_hymission()
-	if hl.plugin.hymission == nil then
-		return
-	end
-
-	hl.config({
-		plugin = {
-			hymission = {
-				show_focus_indicator = 1,
-				small_window_boost = 1.8,
-			},
-		},
-	})
-
-	hl.bind(mainMod .. "+ grave", function()
-		hl.plugin.hymission.open("onlycurrentworkspace")
-	end)
-end
-
 local function setup_hyprexpo()
 	if hl.plugin.hyprexpo == nil then
 		return
@@ -35,7 +16,6 @@ local function setup_hyprexpo()
 				gesture_distance = 200,
 				cancel_key = "escape",
 				show_cursor = 1,
-				-- skip_empty = 1,
 			},
 		},
 	})
@@ -122,7 +102,7 @@ local function setup_dynamic_cursors()
 
 					-- controls how powerful the tilt is, the lower, the more power
 					-- this value controls at which speed (px/s) the full tilt is reached
-					limit = 5000,
+					limit = 3000,
 
 					-- relationship between speed and tilt, supports these values:
 					-- linear             - a linear function is used
@@ -220,6 +200,5 @@ local function setup_dynamic_cursors()
 	})
 end
 
-setup_hymission()
 setup_hyprexpo()
 setup_dynamic_cursors()
