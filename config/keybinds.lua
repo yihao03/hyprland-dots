@@ -140,11 +140,10 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(noctPrefix .. " brightness-up"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(noctPrefix .. " brightness-down"), { locked = true, repeating = true })
 
 hl.bind("XF86Calculator", hl.dsp.exec_cmd(noctPrefix .. " media toggle"), { locked = true })
 
 -- Printscreen
 hl.bind("Print", hl.dsp.exec_cmd(noctPrefix .. " screenshot-region"))
-hl.bind("SHIFT + Print", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'), { locked = true })
