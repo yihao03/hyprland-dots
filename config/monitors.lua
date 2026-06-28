@@ -21,7 +21,7 @@ hl.monitor({
 	mode = "preferred",
 	position = "auto",
 	scale = "1.5",
-	icc = "/home/yihao/.local/share/icc/default.icm",
+	icc = "/home/yihao/.local/share/icc/p3.icm",
 	-- cm = "auto",
 	bitdepth = 10,
 })
