@@ -1,5 +1,4 @@
 require("config.autostart")
-require("config.env")
 require("config.monitors")
 require("config.appearance")
 require("config.misc")

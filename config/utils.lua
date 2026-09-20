@@ -1,5 +1,50 @@
 local M = {}
 
+-- Cached "are we inside an active uwsm session?" check (resolved once at
+-- config load; uwsm presence can't change without a relogin).
+local _under_uwsm = nil
+local function _check(cmd)
+	local handle = io.popen(cmd .. " >/dev/null 2>&1; echo -n $?")
+	if not handle then return false end
+	local out = handle:read("*a")
+	handle:close()
+	return out == "0"
+end
+
+function M.under_uwsm()
+	if _under_uwsm == nil then _under_uwsm = _check("uwsm check is-active") end
+	return _under_uwsm
+end
+
+-- Prefix interactive app launches with runapp (or `uwsm app` as fallback)
+-- when running inside an active uwsm session, so each app gets its own
+-- systemd scope instead of piling into the compositor's unit.
+-- See https://github.com/c4rlo/runapp.
+local _scoped_prefix = nil
+
+local function scoped_prefix()
+	if _scoped_prefix == nil then
+		if M.under_uwsm() then
+			if _check("command -v runapp") then
+				_scoped_prefix = "runapp "
+			elseif _check("command -v uwsm") then
+				_scoped_prefix = "uwsm app -- "
+			else
+				_scoped_prefix = ""
+			end
+		else
+			_scoped_prefix = ""
+		end
+	end
+	return _scoped_prefix
+end
+
+-- Raw prefixed command string, for autostart entries that need Hypr exec
+-- opts (workspace, monitor, ...) which launch_app() can't carry.
+function M.scoped_cmd(cmd) return scoped_prefix() .. cmd end
+
+function M.launch_app(cmd) return hl.dsp.exec_cmd(scoped_prefix() .. cmd) end
+
 M.lt = function(a, b) return a < b end
 M.gt = function(a, b) return a > b end
 
@@ -57,7 +102,9 @@ end
 function M.has_neighbor(axis, cmp)
 	local workspace = get_active_tiled_workspace()
 	local win = hl.get_active_window()
-	if not workspace or not win then return false end
+	-- Floating windows overlay the layout instead of participating in it,
+	-- so they are invisible to neighbor detection in both roles.
+	if not workspace or not win or win.floating then return false end
 
 	local along = axis == "x" and M.window_x or M.window_y
 	local across = axis == "x" and M.window_y or M.window_x
@@ -67,7 +114,7 @@ function M.has_neighbor(axis, cmp)
 	local cross_start = across(win)
 	local cross_end = cross_start + window_size(win, cross_axis)
 	for _, candidate in ipairs(workspace:get_windows()) do
-		if candidate.address ~= win.address and cmp(along(candidate), position) then
+		if candidate.address ~= win.address and not candidate.floating and cmp(along(candidate), position) then
 			local candidate_start = across(candidate)
 			local candidate_end = candidate_start + window_size(candidate, cross_axis)
 			-- A neighbor must overlap perpendicular to the movement direction.
@@ -116,9 +163,7 @@ function M.swap_workspaces(curr_id, target_id)
 		{ timeout = 10, type = "oneshot" }
 	)
 	hl.timer(
-		function()
-			hl.dispatch(hl.dsp.workspace.change_id({ workspace = SWAP_PLACEHOLDER_ID, id = curr_id }))
-		end,
+		function() hl.dispatch(hl.dsp.workspace.change_id({ workspace = SWAP_PLACEHOLDER_ID, id = curr_id })) end,
 		{ timeout = 20, type = "oneshot" }
 	)
 end
@@ -147,40 +192,91 @@ function M.move_workspace_id(direction)
 	end
 end
 
-function M.organize_workspaces()
-	local monitors = {}
+-- Split workspaces into populated ones grouped by monitor and a flat list
+-- of empty workspace IDs to drop. `windows` is the live window count.
+local function partition_workspaces()
+	local populated_by_monitor = {}
 	local monitor_names = {}
+	local empty_ids = {}
 	local max_id = 0
 
 	for _, ws in ipairs(hl.get_workspaces()) do
 		if ws.id >= 1 and ws.monitor then
-			local monitor_name = ws.monitor.name
-			local workspace_ids = monitors[monitor_name]
-			if not workspace_ids then
-				workspace_ids = {}
-				monitors[monitor_name] = workspace_ids
-				table.insert(monitor_names, monitor_name)
-			end
-			table.insert(workspace_ids, ws.id)
 			max_id = math.max(max_id, ws.id)
+			if ws.windows == 0 then
+				table.insert(empty_ids, ws.id)
+			else
+				local monitor_name = ws.monitor.name
+				local group = populated_by_monitor[monitor_name]
+				if not group then
+					group = {}
+					populated_by_monitor[monitor_name] = group
+					table.insert(monitor_names, monitor_name)
+				end
+				table.insert(group, ws.id)
+			end
 		end
 	end
 
+	return populated_by_monitor, monitor_names, empty_ids, max_id
+end
+
+-- Flatten grouped workspace IDs ordered by monitor name, then ID. Also
+-- returns the final ID of the first workspace on `focus_monitor` so a
+-- dropped active workspace can be refocused after compacting.
+local function flatten_workspace_ids(populated_by_monitor, monitor_names, focus_monitor)
 	table.sort(monitor_names)
 	local workspace_ids = {}
+	local focus_id = nil
 	for _, monitor_name in ipairs(monitor_names) do
-		table.sort(monitors[monitor_name])
-		for _, workspace_id in ipairs(monitors[monitor_name]) do
+		local group = populated_by_monitor[monitor_name]
+		table.sort(group)
+		for _, workspace_id in ipairs(group) do
 			table.insert(workspace_ids, workspace_id)
+			-- Kept workspaces are renumbered to 1..N in this order, so the
+			-- position is the final ID.
+			if focus_id == nil and monitor_name == focus_monitor then focus_id = #workspace_ids end
 		end
 	end
+	return workspace_ids, focus_id
+end
 
-	local first_temporary_id = max_id + 1
+local function change_workspace_id(workspace, id)
+	hl.dispatch(hl.dsp.workspace.change_id({ workspace = workspace, id = id }))
+end
+
+function M.organize_workspaces()
+	local active_ws = hl.get_active_workspace()
+	local active_monitor = active_ws and active_ws.monitor and active_ws.monitor.name or nil
+	local active_dropped = active_ws ~= nil and active_ws.id >= 1 and active_ws.windows == 0
+
+	local populated_by_monitor, monitor_names, empty_ids, max_id = partition_workspaces()
+	local workspace_ids, focus_id = flatten_workspace_ids(populated_by_monitor, monitor_names, active_monitor)
+	if #workspace_ids == 0 then return end
+
+	-- Stage through temporary IDs: change_id refuses targets already in
+	-- use, so park dropped empties above max_id first, then move kept
+	-- workspaces through temps to 1..N. Parked empties evaporate once
+	-- unfocused; a dropped active workspace is refocused below.
+	local temp_id = max_id + 1
+	for _, workspace_id in ipairs(empty_ids) do
+		change_workspace_id(workspace_id, temp_id)
+		temp_id = temp_id + 1
+	end
+	local first_temp_id = temp_id
 	for index, workspace_id in ipairs(workspace_ids) do
-		hl.dispatch(hl.dsp.workspace.change_id({ workspace = workspace_id, id = first_temporary_id + index - 1 }))
+		change_workspace_id(workspace_id, first_temp_id + index - 1)
 	end
 	for index = 1, #workspace_ids do
-		hl.dispatch(hl.dsp.workspace.change_id({ workspace = first_temporary_id + index - 1, id = index }))
+		change_workspace_id(first_temp_id + index - 1, index)
+	end
+
+	if active_dropped then
+		if focus_id ~= nil then
+			hl.dispatch(hl.dsp.focus({ workspace = focus_id }))
+		else
+			hl.dispatch(hl.dsp.focus({ workspace = "emptym", on_current_monitor = true }))
+		end
 	end
 end
 

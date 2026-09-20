@@ -17,14 +17,14 @@ local main_mod = constants.main_mod
 local noct_prefix = constants.noct_prefix
 local timeout = constants.timeout
 
--- open apps
-hl.bind(main_mod .. " + Q", hl.dsp.exec_cmd(constants.terminal))
-hl.bind(main_mod .. " + B", hl.dsp.exec_cmd(constants.browser))
-hl.bind(main_mod .. " + SHIFT + B", hl.dsp.exec_cmd(constants.browser .. " --incognito"))
+-- open apps (scoped into their own systemd unit when under uwsm)
+hl.bind(main_mod .. " + Q", utils.launch_app(constants.terminal))
+hl.bind(main_mod .. " + B", utils.launch_app(constants.browser))
+hl.bind(main_mod .. " + SHIFT + B", utils.launch_app(constants.browser .. " --incognito"))
 hl.bind(main_mod .. " + W", hl.dsp.window.close())
 hl.bind(main_mod .. " + CTRL + W", hl.dsp.window.signal({ signal = 9 })) -- SIGKILL
 hl.bind(main_mod .. " + SHIFT + W", hl.dsp.window.signal({ signal = 3 })) -- SIGQUIT
-hl.bind(main_mod .. " + E", hl.dsp.exec_cmd(constants.file_manager))
+hl.bind(main_mod .. " + E", utils.launch_app(constants.file_manager))
 
 -- noctalia commands
 hl.bind(main_mod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noct_prefix .. " panel-toggle session"))
@@ -37,6 +37,16 @@ hl.bind("ALT + Tab", function()
 	hl.dispatch(hl.dsp.exec_cmd(constants.noct_prefix .. " window-switcher"))
 end, { non_consuming = true })
 hl.bind(main_mod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
+
+-- graceful stop: uwsm stop under uwsm (never kill Hyprland / exit dispatcher),
+-- plain exit otherwise. Wedged units recovery: loginctl terminate-user ""
+hl.bind(main_mod .. " + CTRL + Q", function()
+	if utils.under_uwsm() then
+		hl.exec_cmd("uwsm stop")
+	else
+		hl.dispatch(hl.dsp.exit())
+	end
+end)
 
 -- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
 
