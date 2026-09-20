@@ -4,7 +4,13 @@
 -- Or execute your favorite apps at launch like this:
 local start_cmds = {
 	-- important stuff
-	"systemctl --user set-environment XDG_SESSION_CLASS=user",
+	-- Sync Wayland session vars into systemd user manager + D-Bus activation
+	-- env so portals (xdg-desktop-portal-hyprland) and Electron/Qt apps like
+	-- Zoom see XDG_SESSION_TYPE=wayland (Zoom logs isNativeWayland=0 and shows
+	-- black share previews when this is missing).
+	"systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_DESKTOP XDG_SEAT XDG_VTNR",
+	"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_DESKTOP XDG_SEAT XDG_VTNR",
+	"systemctl --user set-environment XDG_SESSION_CLASS=user XDG_SESSION_TYPE=wayland DESKTOP_SESSION=hyprland",
 	"systemctl --user start --no-block hyprland-session.target",
 	"noctalia",
 	"XDG_MENU_PREFIX=arch- kbuildsycoca6",

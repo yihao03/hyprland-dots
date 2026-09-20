@@ -90,6 +90,11 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	match = { class = "Zoom", initial_title = "Meeting" },
+	suppress_event = "activate activatefocus",
+})
+
+hl.window_rule({
 	match = { title = "as_toolbar" },
 	opacity = 0.5,
 })

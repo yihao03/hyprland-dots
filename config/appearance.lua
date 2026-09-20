@@ -12,11 +12,6 @@ hl.config({
 
 		border_size = 1,
 
-		col = {
-			active_border = { colors = { "rgba(b7dabf9a)", "rgba(ae8abd9a)" }, angle = 60 },
-			inactive_border = "rgba(59595922)",
-		},
-
 		-- Set to true to enable resizing windows by clicking and dragging on borders and gaps
 		resize_on_border = true,
 
@@ -27,7 +22,7 @@ hl.config({
 	},
 
 	decoration = {
-		rounding = 8,
+		rounding = 5,
 		rounding_power = 2,
 
 		-- Change transparency of focused and unfocused windows
@@ -43,7 +38,7 @@ hl.config({
 		blur = {
 			enabled = true,
 			size = 3,
-			passes = 3,
+			passes = 4,
 			vibrancy = 0.1696,
 		},
 	},
