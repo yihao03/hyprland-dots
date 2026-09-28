@@ -29,7 +29,7 @@ hl.monitor({
 	position = "auto",
 	scale = "1.5",
 	icc = "/home/yihao/.local/share/icc/default.icm",
-	-- cm = "auto",
+	-- cm = "hdr",
 })
 
 ----------------------------

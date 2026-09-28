@@ -47,7 +47,7 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	match = { class = "org.mozilla.Thunderbird", initial_title = "negative:.*Mozilla Thunderbird|Write.*" },
+	match = { class = "eu.betterbird.Betterbird", initial_title = "negative:.*Betterbird|Write.*" },
 	float = true,
 	workspace = "current",
 })
