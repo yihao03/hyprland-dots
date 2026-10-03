@@ -117,13 +117,6 @@ local function setup_hyprscroll_overview()
 		end, { mouse = true })
 		hl.bind("mouse:274", function() so.window("close") end, { mouse = true })
 	end)
-
-	-- local altTab = require("scripts.alttab")
-	--
-	-- hl.bind("ALT + Tab", altTab.next, { submap_universal = true })
-	-- hl.bind("ALT + SHIFT + Tab", altTab.prev, { submap_universal = true })
-	-- hl.bind("ALT + Alt_L", altTab.close, { release = true, transparent = true })
-	-- hl.bind("ALT + Alt_R", altTab.close, { release = true, transparent = true })
 end
 
 local function setup_dynamic_cursors()
