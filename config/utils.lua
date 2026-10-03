@@ -192,44 +192,65 @@ function M.move_workspace_id(direction)
 	end
 end
 
--- Split workspaces into populated ones grouped by monitor and a flat list
--- of empty workspace IDs to drop. `windows` is the live window count.
+-- Split workspaces into ones to keep, grouped by monitor, and empty workspace
+-- IDs to drop. A monitor with no populated workspaces must keep its active
+-- empty workspace; Hyprland cannot remove the workspace currently displayed
+-- by a monitor.
 local function partition_workspaces()
-	local populated_by_monitor = {}
+	local kept_by_monitor = {}
+	local empty_by_monitor = {}
+	local active_id_by_monitor = {}
 	local monitor_names = {}
 	local empty_ids = {}
 	local max_id = 0
 
+	for _, monitor in ipairs(hl.get_monitors()) do
+		if monitor.active_workspace then active_id_by_monitor[monitor.name] = monitor.active_workspace.id end
+	end
+
 	for _, ws in ipairs(hl.get_workspaces()) do
 		if ws.id >= 1 and ws.monitor then
 			max_id = math.max(max_id, ws.id)
+			local monitor_name = ws.monitor.name
+			local group = kept_by_monitor[monitor_name]
+			if not group then
+				group = {}
+				kept_by_monitor[monitor_name] = group
+				empty_by_monitor[monitor_name] = {}
+				table.insert(monitor_names, monitor_name)
+			end
 			if ws.windows == 0 then
-				table.insert(empty_ids, ws.id)
+				table.insert(empty_by_monitor[monitor_name], ws.id)
 			else
-				local monitor_name = ws.monitor.name
-				local group = populated_by_monitor[monitor_name]
-				if not group then
-					group = {}
-					populated_by_monitor[monitor_name] = group
-					table.insert(monitor_names, monitor_name)
-				end
 				table.insert(group, ws.id)
 			end
 		end
 	end
 
-	return populated_by_monitor, monitor_names, empty_ids, max_id
+	for monitor_name, empties in pairs(empty_by_monitor) do
+		local group = kept_by_monitor[monitor_name]
+		local keep_empty_id = nil
+		if #group == 0 and #empties > 0 then
+			keep_empty_id = active_id_by_monitor[monitor_name] or empties[1]
+			table.insert(group, keep_empty_id)
+		end
+		for _, workspace_id in ipairs(empties) do
+			if workspace_id ~= keep_empty_id then table.insert(empty_ids, workspace_id) end
+		end
+	end
+
+	return kept_by_monitor, monitor_names, empty_ids, max_id
 end
 
 -- Flatten grouped workspace IDs ordered by monitor name, then ID. Also
 -- returns the final ID of the first workspace on `focus_monitor` so a
 -- dropped active workspace can be refocused after compacting.
-local function flatten_workspace_ids(populated_by_monitor, monitor_names, focus_monitor)
+local function flatten_workspace_ids(kept_by_monitor, monitor_names, focus_monitor)
 	table.sort(monitor_names)
 	local workspace_ids = {}
 	local focus_id = nil
 	for _, monitor_name in ipairs(monitor_names) do
-		local group = populated_by_monitor[monitor_name]
+		local group = kept_by_monitor[monitor_name]
 		table.sort(group)
 		for _, workspace_id in ipairs(group) do
 			table.insert(workspace_ids, workspace_id)
@@ -248,10 +269,14 @@ end
 function M.organize_workspaces()
 	local active_ws = hl.get_active_workspace()
 	local active_monitor = active_ws and active_ws.monitor and active_ws.monitor.name or nil
-	local active_dropped = active_ws ~= nil and active_ws.id >= 1 and active_ws.windows == 0
 
-	local populated_by_monitor, monitor_names, empty_ids, max_id = partition_workspaces()
-	local workspace_ids, focus_id = flatten_workspace_ids(populated_by_monitor, monitor_names, active_monitor)
+	local kept_by_monitor, monitor_names, empty_ids, max_id = partition_workspaces()
+	local dropped_ids = {}
+	for _, workspace_id in ipairs(empty_ids) do
+		dropped_ids[workspace_id] = true
+	end
+	local active_dropped = active_ws ~= nil and dropped_ids[active_ws.id] == true
+	local workspace_ids, focus_id = flatten_workspace_ids(kept_by_monitor, monitor_names, active_monitor)
 	if #workspace_ids == 0 then return end
 
 	-- Stage through temporary IDs: change_id refuses targets already in
