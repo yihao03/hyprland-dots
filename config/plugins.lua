@@ -59,32 +59,20 @@ local function setup_hyprscroll_overview()
 			main_mod .. " + H",
 			layout_binding({
 				dwindle = hl.dsp.window.move({ direction = "left" }),
-				scrolling = if_any_neighbor(
-					"y",
-					hl.dsp.window.move({ direction = "left" }),
-					hl.dsp.layout("swapcol l")
-				),
+				scrolling = if_any_neighbor("y", hl.dsp.window.move({ direction = "left" }), hl.dsp.layout("swapcol l")),
 			})
 		)
 		hl.bind(
 			main_mod .. " + L",
 			layout_binding({
 				dwindle = hl.dsp.window.move({ direction = "right" }),
-				scrolling = if_any_neighbor(
-					"y",
-					hl.dsp.window.move({ direction = "right" }),
-					hl.dsp.layout("swapcol r")
-				),
+				scrolling = if_any_neighbor("y", hl.dsp.window.move({ direction = "right" }), hl.dsp.layout("swapcol r")),
 			})
 		)
 		local move_up_or_workspace =
 			if_neighbor("y", lt, hl.dsp.window.move({ direction = "up" }), hl.dsp.window.move({ workspace = "r-1" }))
-		local move_down_or_workspace = if_neighbor(
-			"y",
-			gt,
-			hl.dsp.window.move({ direction = "down" }),
-			hl.dsp.window.move({ workspace = "r+1" })
-		)
+		local move_down_or_workspace =
+			if_neighbor("y", gt, hl.dsp.window.move({ direction = "down" }), hl.dsp.window.move({ workspace = "r+1" }))
 		hl.bind(
 			main_mod .. " + K",
 			layout_binding({

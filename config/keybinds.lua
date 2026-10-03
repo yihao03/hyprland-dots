@@ -142,22 +142,14 @@ hl.bind(
 	main_mod .. " + SHIFT + H",
 	layout_binding({
 		dwindle = hl.dsp.window.move({ direction = "left" }),
-		scrolling = if_any_neighbor(
-			"y",
-			hl.dsp.window.move({ direction = "left" }),
-			hl.dsp.layout("swapcol l")
-		),
+		scrolling = if_any_neighbor("y", hl.dsp.window.move({ direction = "left" }), hl.dsp.layout("swapcol l")),
 	})
 )
 hl.bind(
 	main_mod .. " + SHIFT + L",
 	layout_binding({
 		dwindle = hl.dsp.window.move({ direction = "right" }),
-		scrolling = if_any_neighbor(
-			"y",
-			hl.dsp.window.move({ direction = "right" }),
-			hl.dsp.layout("swapcol r")
-		),
+		scrolling = if_any_neighbor("y", hl.dsp.window.move({ direction = "right" }), hl.dsp.layout("swapcol r")),
 	})
 )
 local move_up_or_workspace =
