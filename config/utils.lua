@@ -127,9 +127,18 @@ end
 function M.has_any_neighbor(axis) return M.has_neighbor(axis, M.lt) or M.has_neighbor(axis, M.gt) end
 
 -- Return a keypress-time action dispatching `primary` when a neighbor exists
--- in the given direction, otherwise `fallback`.
-function M.if_neighbor(axis, cmp, primary, fallback)
+-- in the given direction, otherwise `fallback`. Focus bindings can supply a
+-- native directional action for floats, falling back only if focus stays put.
+function M.if_neighbor(axis, cmp, primary, fallback, floating_primary)
 	return function()
+		local win = floating_primary and hl.get_active_window()
+		if win and win.floating then
+			hl.dispatch(floating_primary)
+			local focused = hl.get_active_window()
+			if focused and focused.address ~= win.address then return end
+			hl.dispatch(fallback)
+			return
+		end
 		if M.has_neighbor(axis, cmp) then
 			hl.dispatch(primary)
 		else

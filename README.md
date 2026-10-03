@@ -74,6 +74,10 @@ to the active layout (`dwindle` vs `scrolling`) via `layout_binding()` in
 | `K` / `J` | Neighbor → up / down, else workspace `r-1 / r+1` | Neighbor → `focus u / d`, else workspace `r-1 / r+1` |
 | `SUPER + mouse_up / down` | — | `focus l / r` |
 
+With a floating window focused, `H / J / K / L` use native directional focus.
+`K / J` switch workspace only if directional focus leaves the same window
+focused. Tiled navigation keeps the behavior above.
+
 ## Move with `SUPER + SHIFT + H J K L`
 
 | Keys | Dwindle | Scrolling |

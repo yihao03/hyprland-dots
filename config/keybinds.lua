@@ -77,7 +77,7 @@ end)
 hl.bind(main_mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
 
--- Move focus with main_mod + arrow keys
+-- Move focus with main_mod + H/J/K/L, including floating windows.
 hl.bind(
 	main_mod .. " + H",
 	layout_binding({
@@ -99,13 +99,15 @@ hl.bind(
 			"y",
 			lt,
 			hl.dsp.focus({ direction = "up" }),
-			hl.dsp.focus({ workspace = "r-1" })
+			hl.dsp.focus({ workspace = "r-1" }),
+			hl.dsp.focus({ direction = "up" })
 		),
 		scrolling = if_neighbor(
 			"y",
 			lt,
 			hl.dsp.layout("focus u"),
-			hl.dsp.focus({ workspace = "r-1" })
+			hl.dsp.focus({ workspace = "r-1" }),
+			hl.dsp.focus({ direction = "up" })
 		),
 	})
 )
@@ -116,13 +118,15 @@ hl.bind(
 			"y",
 			gt,
 			hl.dsp.focus({ direction = "down" }),
-			hl.dsp.focus({ workspace = "r+1" })
+			hl.dsp.focus({ workspace = "r+1" }),
+			hl.dsp.focus({ direction = "down" })
 		),
 		scrolling = if_neighbor(
 			"y",
 			gt,
 			hl.dsp.layout("focus d"),
-			hl.dsp.focus({ workspace = "r+1" })
+			hl.dsp.focus({ workspace = "r+1" }),
+			hl.dsp.focus({ direction = "down" })
 		),
 	})
 )
