@@ -126,3 +126,11 @@ hl.window_rule({
 	match = { class = "com.github.xournalpp.xournalpp" },
 	workspace = "current",
 })
+
+hl.window_rule({
+	match = { class = "granola", title = "Nub" },
+	move = { "(monitor_w * 0.95)", "30" },
+	pin = true,
+	decorate = false,
+	no_blur = true,
+})
