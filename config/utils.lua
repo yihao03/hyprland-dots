@@ -274,4 +274,15 @@ function M.organize_workspaces()
 	end
 end
 
+function M.toggle_fullscreen()
+	local opts = { action = "toggle", internal = 2, client = 2 }
+	-- prevent helium from going fullscreen and hiding sidebar
+	local window = hl.get_active_window()
+	if window then
+		local class = window.class
+		if class == "helium" or class == "brave-origin-nightly" then opts.client = 0 end
+	end
+	hl.dispatch(hl.dsp.window.fullscreen_state(opts))
+end
+
 return M

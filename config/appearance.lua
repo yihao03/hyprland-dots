@@ -2,7 +2,7 @@
 ---- LOOK AND FEEL ----
 -----------------------
 
-local active_layout = require("config.constants").active_layout
+local default_layout = require("config.constants").default_layout
 
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
@@ -18,7 +18,7 @@ hl.config({
 		-- Please see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/ before you turn this on
 		allow_tearing = false,
 
-		layout = active_layout,
+		layout = default_layout,
 	},
 
 	decoration = {
@@ -121,23 +121,3 @@ hl.window_rule({
 	border_size = 0,
 	rounding = 0,
 })
-
-if active_layout == "dwindle" then
-	hl.gesture({
-		fingers = 3,
-		direction = "horizontal",
-		action = "workspace",
-	})
-elseif active_layout == "scrolling" then
-	hl.gesture({
-		fingers = 3,
-		direction = "horizontal",
-		action = "scroll_move",
-		scale = 5,
-	})
-	hl.gesture({
-		fingers = 3,
-		direction = "vertical",
-		action = "workspace",
-	})
-end

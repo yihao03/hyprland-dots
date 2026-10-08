@@ -13,6 +13,7 @@ local layout_binding = utils.layout_binding
 local toggle_tiled_layout = utils.toggle_tiled_layout
 
 local constants = require("config.constants")
+local default_layout = constants.default_layout
 local main_mod = constants.main_mod
 local noct_prefix = constants.noct_prefix
 local timeout = constants.timeout
@@ -41,6 +42,32 @@ hl.bind(main_mod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 -- Stop the UWSM session gracefully.
 hl.bind(main_mod .. " + CTRL + Q", hl.dsp.exec_cmd("uwsm stop"))
 
+if default_layout == "dwindle" then
+	hl.gesture({
+		fingers = 3,
+		direction = "horizontal",
+		action = "workspace",
+	})
+elseif default_layout == "scrolling" then
+	hl.gesture({
+		fingers = 3,
+		direction = "horizontal",
+		action = "scroll_move",
+		scale = 5,
+	})
+	hl.gesture({
+		fingers = 3,
+		direction = "vertical",
+		action = "workspace",
+	})
+end
+
+hl.gesture({
+	fingers = 4,
+	direction = "pinch",
+	action = function() utils.toggle_fullscreen() end,
+})
+
 -- Windowing controls
 hl.bind(main_mod .. " + V", function()
 	hl.dispatch(hl.dsp.window.float({ toggle = true }))
@@ -55,16 +82,7 @@ hl.bind(
 	})
 )
 hl.bind(main_mod .. " + CTRL + T", toggle_tiled_layout)
-hl.bind(main_mod .. " + F", function()
-	local opts = { action = "toggle", internal = 2, client = 2 }
-	-- prevent helium from going fullscreen and hiding sidebar
-	local window = hl.get_active_window()
-	if window then
-		local class = window.class
-		if class == "helium" or class == "brave-origin-nightly" then opts.client = 0 end
-	end
-	hl.dispatch(hl.dsp.window.fullscreen_state(opts))
-end)
+hl.bind(main_mod .. " + F", function() utils.toggle_fullscreen() end)
 hl.bind(main_mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind("ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
 

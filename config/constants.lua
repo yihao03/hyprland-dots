@@ -6,7 +6,7 @@ M.noct_prefix = "noctalia msg"
 M.menu = M.noct_prefix .. " panel-toggle launcher"
 M.browser = "brave-origin-nightly"
 M.main_mod = "SUPER" -- Sets "Windows" key as main modifier
-M.active_layout = "scrolling" -- "dwindle", "master", "scrolling"
+M.default_layout = "scrolling" -- "dwindle", "master", "scrolling"
 
 M.timeout = {
 	short = 1500,
