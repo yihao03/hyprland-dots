@@ -31,6 +31,7 @@ hl.bind(main_mod .. " + E", utils.launch_app(constants.file_manager))
 hl.bind(main_mod .. " + CTRL + L", hl.dsp.exec_cmd(constants.noct_prefix .. " panel-toggle session"))
 hl.bind(main_mod .. " + A", hl.dsp.exec_cmd(constants.noct_prefix .. " panel-toggle control-center"))
 hl.bind(main_mod .. " + SHIFT + V", hl.dsp.exec_cmd(constants.noct_prefix .. " panel-toggle clipboard"))
+hl.bind(main_mod .. " + I", hl.dsp.exec_cmd(constants.noct_prefix .. " settings-open"))
 hl.bind("ALT + Tab", function()
 	for _, layer in ipairs(hl.get_layers()) do
 		if layer.namespace == "noctalia-window-switcher" then return end

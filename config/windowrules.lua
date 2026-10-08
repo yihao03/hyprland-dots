@@ -134,3 +134,11 @@ hl.window_rule({
 	decorate = false,
 	no_blur = true,
 })
+
+hl.window_rule({
+	match = { class = "org.gnome.Nautilus|dev.noctalia.Noctalia|xdg-desktop-portal-gtk" },
+	float = true,
+	rounding = 18,
+	rounding_power = 3.5,
+	size = { "(monitor_w * 0.5)", "(monitor_h * 0.5)" },
+})
