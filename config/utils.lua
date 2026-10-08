@@ -1,49 +1,9 @@
 local M = {}
 
--- Cached "are we inside an active uwsm session?" check (resolved once at
--- config load; uwsm presence can't change without a relogin).
-local _under_uwsm = nil
-local function _check(cmd)
-	local handle = io.popen(cmd .. " >/dev/null 2>&1; echo -n $?")
-	if not handle then return false end
-	local out = handle:read("*a")
-	handle:close()
-	return out == "0"
-end
+-- Launch apps in their own systemd scopes within the UWSM session.
+function M.scoped_cmd(cmd) return "runapp " .. cmd end
 
-function M.under_uwsm()
-	if _under_uwsm == nil then _under_uwsm = _check("uwsm check is-active") end
-	return _under_uwsm
-end
-
--- Prefix interactive app launches with runapp (or `uwsm app` as fallback)
--- when running inside an active uwsm session, so each app gets its own
--- systemd scope instead of piling into the compositor's unit.
--- See https://github.com/c4rlo/runapp.
-local _scoped_prefix = nil
-
-local function scoped_prefix()
-	if _scoped_prefix == nil then
-		if M.under_uwsm() then
-			if _check("command -v runapp") then
-				_scoped_prefix = "runapp "
-			elseif _check("command -v uwsm") then
-				_scoped_prefix = "uwsm app -- "
-			else
-				_scoped_prefix = ""
-			end
-		else
-			_scoped_prefix = ""
-		end
-	end
-	return _scoped_prefix
-end
-
--- Raw prefixed command string, for autostart entries that need Hypr exec
--- opts (workspace, monitor, ...) which launch_app() can't carry.
-function M.scoped_cmd(cmd) return scoped_prefix() .. cmd end
-
-function M.launch_app(cmd) return hl.dsp.exec_cmd(scoped_prefix() .. cmd) end
+function M.launch_app(cmd) return hl.dsp.exec_cmd(M.scoped_cmd(cmd)) end
 
 M.lt = function(a, b) return a < b end
 M.gt = function(a, b) return a > b end

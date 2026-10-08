@@ -3,7 +3,7 @@
 -- uwsm/systemd owns session env and long-lived daemons (noctalia,
 -- lid-inhibit, synology-drive user units), so only one-shots and
 -- workspace-placed apps stay here. Interactive apps are scoped via
--- utils.scoped_cmd (runapp / `uwsm app`) like keybind launches.
+-- runapp via utils.scoped_cmd, like keybind launches.
 local utils = require("config.utils")
 
 local start_cmds = {

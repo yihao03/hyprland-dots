@@ -17,7 +17,7 @@ local main_mod = constants.main_mod
 local noct_prefix = constants.noct_prefix
 local timeout = constants.timeout
 
--- open apps (scoped into their own systemd unit when under uwsm)
+-- Open apps in their own systemd scopes.
 hl.bind(main_mod .. " + Q", utils.launch_app(constants.terminal))
 hl.bind(main_mod .. " + B", utils.launch_app(constants.browser))
 hl.bind(main_mod .. " + SHIFT + B", utils.launch_app(constants.browser .. " --incognito"))
@@ -38,17 +38,8 @@ hl.bind("ALT + Tab", function()
 end, { non_consuming = true })
 hl.bind(main_mod .. " + SHIFT + F23", hl.dsp.exec_cmd(constants.menu))
 
--- graceful stop: uwsm stop under uwsm (never kill Hyprland / exit dispatcher),
--- plain exit otherwise. Wedged units recovery: loginctl terminate-user ""
-hl.bind(main_mod .. " + CTRL + Q", function()
-	if utils.under_uwsm() then
-		hl.exec_cmd("uwsm stop")
-	else
-		hl.dispatch(hl.dsp.exit())
-	end
-end)
-
--- command to lock: command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'
+-- Stop the UWSM session gracefully.
+hl.bind(main_mod .. " + CTRL + Q", hl.dsp.exec_cmd("uwsm stop"))
 
 -- Windowing controls
 hl.bind(main_mod .. " + V", function()

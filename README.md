@@ -4,6 +4,10 @@ Hyprland configured in Lua (`hyprland.lua` → `config/*`). The same keys adapt
 to the active layout (`dwindle` vs `scrolling`) via `layout_binding()` in
 `config/utils.lua`.
 
+Sessions use UWSM exclusively. App launches require `runapp` for systemd scopes;
+`SUPER + CTRL + Q` ends the session with `uwsm stop`. UWSM/systemd manages the
+session environment and long-lived daemons.
+
 ## Philosophy
 
 - **Modifiers compose.** `SUPER` focuses, `SHIFT` moves, `ALT` resizes or
