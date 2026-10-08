@@ -161,116 +161,40 @@ function M.move_workspace_id(direction)
 	end
 end
 
--- Split workspaces into ones to keep, grouped by monitor, and empty workspace
--- IDs to drop. A monitor with no populated workspaces must keep its active
--- empty workspace; Hyprland cannot remove the workspace currently displayed
--- by a monitor.
-local function partition_workspaces()
-	local kept_by_monitor = {}
-	local empty_by_monitor = {}
-	local active_id_by_monitor = {}
+-- Compact workspace IDs to 1..N, ordered by monitor name, then ID.
+function M.organize_workspaces()
+	local by_monitor = {}
 	local monitor_names = {}
-	local empty_ids = {}
 	local max_id = 0
-
-	for _, monitor in ipairs(hl.get_monitors()) do
-		if monitor.active_workspace then active_id_by_monitor[monitor.name] = monitor.active_workspace.id end
-	end
-
 	for _, ws in ipairs(hl.get_workspaces()) do
 		if ws.id >= 1 and ws.monitor then
 			max_id = math.max(max_id, ws.id)
 			local monitor_name = ws.monitor.name
-			local group = kept_by_monitor[monitor_name]
-			if not group then
-				group = {}
-				kept_by_monitor[monitor_name] = group
-				empty_by_monitor[monitor_name] = {}
+			if not by_monitor[monitor_name] then
+				by_monitor[monitor_name] = {}
 				table.insert(monitor_names, monitor_name)
 			end
-			if ws.windows == 0 then
-				table.insert(empty_by_monitor[monitor_name], ws.id)
-			else
-				table.insert(group, ws.id)
-			end
+			table.insert(by_monitor[monitor_name], ws.id)
 		end
 	end
 
-	for monitor_name, empties in pairs(empty_by_monitor) do
-		local group = kept_by_monitor[monitor_name]
-		local keep_empty_id = nil
-		if #group == 0 and #empties > 0 then
-			keep_empty_id = active_id_by_monitor[monitor_name] or empties[1]
-			table.insert(group, keep_empty_id)
-		end
-		for _, workspace_id in ipairs(empties) do
-			if workspace_id ~= keep_empty_id then table.insert(empty_ids, workspace_id) end
-		end
-	end
-
-	return kept_by_monitor, monitor_names, empty_ids, max_id
-end
-
--- Flatten grouped workspace IDs ordered by monitor name, then ID. Also
--- returns the final ID of the first workspace on `focus_monitor` so a
--- dropped active workspace can be refocused after compacting.
-local function flatten_workspace_ids(kept_by_monitor, monitor_names, focus_monitor)
 	table.sort(monitor_names)
 	local workspace_ids = {}
-	local focus_id = nil
 	for _, monitor_name in ipairs(monitor_names) do
-		local group = kept_by_monitor[monitor_name]
+		local group = by_monitor[monitor_name]
 		table.sort(group)
 		for _, workspace_id in ipairs(group) do
 			table.insert(workspace_ids, workspace_id)
-			-- Kept workspaces are renumbered to 1..N in this order, so the
-			-- position is the final ID.
-			if focus_id == nil and monitor_name == focus_monitor then focus_id = #workspace_ids end
 		end
 	end
-	return workspace_ids, focus_id
-end
 
-local function change_workspace_id(workspace, id)
-	hl.dispatch(hl.dsp.workspace.change_id({ workspace = workspace, id = id }))
-end
-
-function M.organize_workspaces()
-	local active_ws = hl.get_active_workspace()
-	local active_monitor = active_ws and active_ws.monitor and active_ws.monitor.name or nil
-
-	local kept_by_monitor, monitor_names, empty_ids, max_id = partition_workspaces()
-	local dropped_ids = {}
-	for _, workspace_id in ipairs(empty_ids) do
-		dropped_ids[workspace_id] = true
-	end
-	local active_dropped = active_ws ~= nil and dropped_ids[active_ws.id] == true
-	local workspace_ids, focus_id = flatten_workspace_ids(kept_by_monitor, monitor_names, active_monitor)
-	if #workspace_ids == 0 then return end
-
-	-- Stage through temporary IDs: change_id refuses targets already in
-	-- use, so park dropped empties above max_id first, then move kept
-	-- workspaces through temps to 1..N. Parked empties evaporate once
-	-- unfocused; a dropped active workspace is refocused below.
-	local temp_id = max_id + 1
-	for _, workspace_id in ipairs(empty_ids) do
-		change_workspace_id(workspace_id, temp_id)
-		temp_id = temp_id + 1
-	end
-	local first_temp_id = temp_id
+	-- Stage above existing IDs so renumbering cannot collide.
+	local first_temp_id = max_id + 1
 	for index, workspace_id in ipairs(workspace_ids) do
-		change_workspace_id(workspace_id, first_temp_id + index - 1)
+		hl.dispatch(hl.dsp.workspace.change_id({ workspace = workspace_id, id = first_temp_id + index - 1 }))
 	end
 	for index = 1, #workspace_ids do
-		change_workspace_id(first_temp_id + index - 1, index)
-	end
-
-	if active_dropped then
-		if focus_id ~= nil then
-			hl.dispatch(hl.dsp.focus({ workspace = focus_id }))
-		else
-			hl.dispatch(hl.dsp.focus({ workspace = "emptym", on_current_monitor = true }))
-		end
+		hl.dispatch(hl.dsp.workspace.change_id({ workspace = first_temp_id + index - 1, id = index }))
 	end
 end
 
